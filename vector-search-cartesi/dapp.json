@@ -1,0 +1,9 @@
+{
+  "fs": {
+    "files": [
+      ".crossenv",
+      "vector-search.py",
+      "entrypoint.sh"
+    ]
+  }
+}
