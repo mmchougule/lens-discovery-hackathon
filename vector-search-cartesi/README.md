@@ -28,6 +28,30 @@ cd frontend-console
 yarn start input send --payload "Hello there"
 ```
 
+## Unsolved challenges
+
+- Build time for Cartesi machine was prohibitively long due to the size of dependencies (such as `pytorch`). The build time took about 185 minutes.
+- After successful build, machine fails with OOM error. TODO: Try increasing error limits again.
+- `numpy` fails to build or run on this machine. Some of the error messages in the toggle below:
+
+<details>
+  <summary>numpy errors</summary>
+  
+  <p>
+    #0 287.5                   sources = self.generate_sources(sources, ext)
+    #0 287.5                 File "/tmp/pip-install-8g4q4na8/numpy_013c6621a6a94ea3a936d008fac0c0a8/numpy/distutils/command/build_src.py", line 378, in generate_sources
+    #0 287.5                   source = func(extension, build_dir)
+    #0 287.5                 File "/tmp/pip-install-8g4q4na8/numpy_013c6621a6a94ea3a936d008fac0c0a8/numpy/core/setup.py", line 434, in generate_config_h
+    #0 287.5                   moredefs, ignored = cocache.check_types(config_cmd, ext, build_dir)
+    #0 287.5                 File "/tmp/pip-install-8g4q4na8/numpy_013c6621a6a94ea3a936d008fac0c0a8/numpy/core/setup.py", line 44, in check_types
+    #0 287.5                   out = check_types(*a, **kw)
+    #0 287.5                 File "/tmp/pip-install-8g4q4na8/numpy_013c6621a6a94ea3a936d008fac0c0a8/numpy/core/setup.py", line 289, in check_types
+    #0 287.5                   raise SystemError(
+    #0 287.5               SystemError: Cannot compile 'Python.h'. Perhaps you need to install python-dev|python-devel.
+    #0 287.5               [end of output]
+  </p>
+</details>
+
 ## Screenshots
 
 ### Request
