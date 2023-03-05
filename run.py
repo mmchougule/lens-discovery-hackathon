@@ -19,10 +19,9 @@ class NeuralSearcher:
         self.model = SentenceTransformer('distilbert-base-nli-stsb-mean-tokens', device='cpu')
         # self.model = SentenceTransformer("all-MiniLM-L6-v2")
         self.qdrant_client = QdrantClient(
-            host=os.environ["QDRANT_HOST"], 
-            api_key=os.environ["QDRANT_API_KEY"],
+            host=os.environ.get("QDRANT_HOST", "b8be5dab-08a0-43ec-ae4a-ed92bbd23805.us-east-1-0.aws.cloud.qdrant.io"),
+            api_key=os.environ.get("QDRANT_API_KEY", "Ws4dvr1f4ULm0QUp3Pbvzt4AYaL5Eits6WWi8MbW0fQlub7pP0T6Ew"),
         )
-        # self.cursor = cursor
 
     def search(self, text: str, filter_: dict = None) -> List[dict]:
         vector = self.model.encode(text).tolist()
@@ -41,9 +40,8 @@ n = NeuralSearcher("lens_posts_4")
 # Define the GraphQL API endpoint
 graphql_url = 'https://api.lens.dev/playground'
 
-@st.cache
+@st.cache_resource(ttl=600)
 def get_response(query, variables):
-    # Send the HTTP POST request with the query and variables
     response = requests.post(graphql_url, json={'query': query, 'variables': variables})
     # Parse the response JSON and display the results in Streamlit
     data = response.json()
