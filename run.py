@@ -10,8 +10,13 @@ from typing import List
 import requests
 
 
-st.set_page_config(layout="wide", page_title="Lens Discovery")
+st.set_page_config(layout="centered", page_title="Lens Discovery")
 
+# set width of the layout in pixels
+st.markdown(
+    f'<div style="min-width: 700px; />',
+    unsafe_allow_html=True
+)
 @st.cache_resource
 class NeuralSearcher:
     def __init__(self, collection_name: str, cursor=None):
@@ -20,7 +25,7 @@ class NeuralSearcher:
         # self.model = SentenceTransformer("all-MiniLM-L6-v2")
         self.qdrant_client = QdrantClient(
             host=os.environ.get("QDRANT_HOST", "b8be5dab-08a0-43ec-ae4a-ed92bbd23805.us-east-1-0.aws.cloud.qdrant.io"),
-            api_key=os.environ.get("QDRANT_API_KEY", "Ws4dvr1f4ULm0QUp3Pbvzt4AYaL5Eits6WWi8MbW0fQlub7pP0T6Ew"),
+            api_key=os.environ.get("QDRANT_API_KEY", ""),
         )
 
     def search(self, text: str, filter_: dict = None) -> List[dict]:
@@ -52,7 +57,7 @@ query {
   explorePublications(
     request: {
       # cursor: "{\"offset\":0}",
-      limit: 10,
+      limit: 40,
       publicationTypes: POST,
       sortCriteria: LATEST
     }
@@ -120,8 +125,9 @@ def format_text(text):
         )
 
 
-t = st.text_input("Enter text")
-
+t = st.text_input("Search for anything...", 
+        placeholder="ethdenver hackers",
+)
 if t:
     # st.header("You may also like")
     format_text(t)
