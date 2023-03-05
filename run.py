@@ -12,7 +12,7 @@ import requests
 st.set_page_config(
     page_title="Lens Discovery",
     page_icon=":mag:",
-    layout="centered",
+    layout="wide",
     initial_sidebar_state="collapsed",
 )
 
@@ -35,17 +35,27 @@ css_style = f"""
         }}
         .st-bv.st-bs {{
             padding: 1rem;
-            color: {text_color}
+            color: {grad2}
         }}
     </style>
 """
 st.markdown(css_style, unsafe_allow_html=True)
 
+header_container = st.container()
+cols = header_container.columns([1, 3, 1])
+
+with cols[0]:
+    st.write("")
+with cols[2]:
+    st.write("")
+with cols[1]:
+    st.write("<h1 style='text-align: center;'>Lens Discovery</h1>", unsafe_allow_html=True)
+    st.write("<p style='text-align: center;'>AI-based lens content search and recommendations</p>", unsafe_allow_html=True)
+
 # Define app layout
 header = st.container()
 search = st.container()
 latest_posts = st.container()
-st.header("Lens Discovery")
 
 @st.cache_resource
 class NeuralSearcher:
@@ -65,7 +75,7 @@ class NeuralSearcher:
             query_vector=vector,
             query_filter=Filter(**filter_) if filter_ else None,
             with_payload=True,
-            limit=10
+            limit=15
         )
         return payloads
 
@@ -138,23 +148,51 @@ def search_neural(text):
     results = n.search(text)
     return results
 
+def add_markdown(c, chunk, i):
+    with c:
+      post_id = chunk[i].payload["post_id"]
+      st.markdown(
+          f"""
+          <div class="gradient-background" style="border: 1px solid #ccc; border-radius: 5px; padding: 10px; margin-bottom: 10px; ">
+          <a href="https://lenster.xyz/posts/{post_id}" style="text-decoration: none;" />
+          <h3>{post_id}</h3></a><p style="font-size: 16px;">{chunk[i].payload["content"]}</p></div>
+          """,
+          unsafe_allow_html=True
+      )
+
+def add_markdown_latest(c, chunk, i):
+    with c:
+      # st.write(chunk.iloc[i].metadata["content"])
+
+      st.markdown(
+          f"""
+          <div class="gradient-background" style="border: 1px solid #ccc; border-radius: 5px; padding: 10px; margin-bottom: 10px; ">
+          <a href="https://lenster.xyz/posts/{chunk.iloc[i].id}" style="text-decoration: none;" />
+          <h3>{chunk.iloc[i].id}</h3></a><p style="font-size: 16px;">{chunk.iloc[i].metadata["content"]}</p></div>
+          """,
+          unsafe_allow_html=True
+      )
+      btn_clicked = st.button(f'find similar: {chunk.iloc[i].id}')
+      if btn_clicked:
+          format_text(chunk.iloc[i].metadata["content"])
+
 def format_text(text):
     results = n.search(text)
     if not results:
         return None
     st.header("posts found")
-    row6_spacer1, row6_1  = st.columns((.2, 7.3))
+    # row6_spacer1, row6_1  = st.columns((.2, 7.3))
+    chunk_size = 3
+    for i in range(0, len(results), chunk_size):
+        chunk = results[i:i+chunk_size]
+        col1, col2, col3 = st.columns(3)
 
-    with row6_1:
-      for r in results:
-        st.write("----------------------------------------------------------------------------------------------------------------------------------------------------")
-        st.markdown(
-            f"""
-            <a href="https://lenster.xyz/posts/{r.payload["post_id"]}" style="text-decoration: none;" />
-            <h3>{r.payload["post_id"]}</h3></a><p style="font-size: 16px;">{r.payload["content"]}</p></div>
-            """,
-            unsafe_allow_html=True
-        )
+        with col1:
+          add_markdown(col1, chunk, 0)
+        with col2:
+          add_markdown(col2, chunk, 1)
+        with col3:
+          add_markdown(col3, chunk, 2)
 
 t = st.text_input("Search for anything...", 
         placeholder="ethdenver hackers",
@@ -162,7 +200,6 @@ t = st.text_input("Search for anything...",
 if t:
     st.markdown(
       f"""
-
       <div class="gradient-background" style="border: 1px solid #ccc; color: #fff, border-radius: 5px; padding: 10px; margin-bottom: 10px; ">
       """,
       unsafe_allow_html=True
@@ -175,25 +212,21 @@ data = get_response(query, variables)
 def format_latest(data_raw):
     df = pd.DataFrame(data_raw)
     data = df.drop_duplicates(subset=['id'])
-    for r in data.itertuples():
-        if r.metadata["content"].strip() == "":
-            continue
-        # set the gradient background
-        st.markdown(
-            f"""
+    chunk_size = 3
+    for i in range(0, len(data), chunk_size):
+        chunk = data[i:i+chunk_size]
+        col1, col2, col3 = st.columns(3)
 
-            <div class="gradient-background" style="border: 1px solid #ccc; border-radius: 5px; padding: 10px; margin-bottom: 10px; ">
-            <a href="https://lenster.xyz/posts/{r.id}" style="text-decoration: none; color: white;">
-            <h3>{r.id}</h3></a><p style="font-size: 16px; color: white;">{r.metadata["content"]}</p></div>
-            """,
-            unsafe_allow_html=True
-        )
-
-        btn_clicked = st.button(f'find similar: {r.id}')
-        if btn_clicked:
-            format_text(r.metadata["content"])
+        st.write("----------------------------------------------------------------------------------------------------------------------------------------------------")
+        with col1:
+          add_markdown_latest(col1, chunk, 0)
+        with col2:
+          add_markdown_latest(col2, chunk, 1)
+        with col3:
+          add_markdown_latest(col3, chunk, 2)
         st.write("----------------------------------------------------------------------------------------------------------------------------------------------------")
 
+st.write("----------------------------------------------------------------------------------------------------------------------------------------------------")
 st.header("Latest posts")
 if data['data']['explorePublications']['items']:
     format_latest(data['data']['explorePublications']['items'])
