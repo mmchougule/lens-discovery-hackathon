@@ -1,7 +1,7 @@
 {
   "fs": {
     "files": [
-      ".crossenv",
+      ".venv",
       "vector-search.py",
       "entrypoint.sh"
     ]
