@@ -37,18 +37,19 @@ yarn start input send --payload "Hello there"
 <details>
   <summary>numpy errors</summary>
   
-  #0 287.5                   sources = self.generate_sources(sources, ext)
-  #0 287.5                 File "/tmp/pip-install-8g4q4na8/numpy_013c6621a6a94ea3a936d008fac0c0a8/numpy/distutils/command/build_src.py", line 378, in generate_sources
-  #0 287.5                   source = func(extension, build_dir)
-  #0 287.5                 File "/tmp/pip-install-8g4q4na8/numpy_013c6621a6a94ea3a936d008fac0c0a8/numpy/core/setup.py", line 434, in generate_config_h
-  #0 287.5                   moredefs, ignored = cocache.check_types(config_cmd, ext, build_dir)
-  #0 287.5                 File "/tmp/pip-install-8g4q4na8/numpy_013c6621a6a94ea3a936d008fac0c0a8/numpy/core/setup.py", line 44, in check_types
-  #0 287.5                   out = check_types(*a, **kw)
-  #0 287.5                 File "/tmp/pip-install-8g4q4na8/numpy_013c6621a6a94ea3a936d008fac0c0a8/numpy/core/setup.py", line 289, in check_types
-  #0 287.5                   raise SystemError(
-  #0 287.5               SystemError: Cannot compile 'Python.h'. Perhaps you need to install python-dev|python-devel.
-  #0 287.5               [end of output]
-  
+  <p>
+    #0 287.5                   sources = self.generate_sources(sources, ext)
+    #0 287.5                 File "/tmp/pip-install-8g4q4na8/numpy_013c6621a6a94ea3a936d008fac0c0a8/numpy/distutils/command/build_src.py", line 378, in generate_sources
+    #0 287.5                   source = func(extension, build_dir)
+    #0 287.5                 File "/tmp/pip-install-8g4q4na8/numpy_013c6621a6a94ea3a936d008fac0c0a8/numpy/core/setup.py", line 434, in generate_config_h
+    #0 287.5                   moredefs, ignored = cocache.check_types(config_cmd, ext, build_dir)
+    #0 287.5                 File "/tmp/pip-install-8g4q4na8/numpy_013c6621a6a94ea3a936d008fac0c0a8/numpy/core/setup.py", line 44, in check_types
+    #0 287.5                   out = check_types(*a, **kw)
+    #0 287.5                 File "/tmp/pip-install-8g4q4na8/numpy_013c6621a6a94ea3a936d008fac0c0a8/numpy/core/setup.py", line 289, in check_types
+    #0 287.5                   raise SystemError(
+    #0 287.5               SystemError: Cannot compile 'Python.h'. Perhaps you need to install python-dev|python-devel.
+    #0 287.5               [end of output]
+  </p>
 </details>
 
 ## Screenshots
