@@ -9,14 +9,44 @@ from sentence_transformers import SentenceTransformer
 from typing import List
 import requests
 
-
-st.set_page_config(layout="centered", page_title="Lens Discovery")
-
-# set width of the layout in pixels
-st.markdown(
-    f'<div style="min-width: 700px; />',
-    unsafe_allow_html=True
+st.set_page_config(
+    page_title="Lens Discovery",
+    page_icon=":mag:",
+    layout="centered",
+    initial_sidebar_state="collapsed",
 )
+
+# Define app colors
+background = "#E6F4F1"
+primary_color = "#1DBF73"
+secondary_color = "#1DA1F2"
+text_color = "#262730"
+
+grad1 = "#ee7752"
+grad2 = "#e73c7e"
+css_style = f"""
+    <style>
+
+        .reportview-container, .appview-container.css-1wrcr25.egzxvld6 {{
+            background: linear-gradient(to bottom, {grad1} 0%, {grad2} 100%);
+        }}
+        .css-17eq0hr {{
+            color: {text_color};
+        }}
+        .st-bv.st-bs {{
+            padding: 1rem;
+            color: {text_color}
+        }}
+    </style>
+"""
+st.markdown(css_style, unsafe_allow_html=True)
+
+# Define app layout
+header = st.container()
+search = st.container()
+latest_posts = st.container()
+st.header("Lens Discovery")
+
 @st.cache_resource
 class NeuralSearcher:
     def __init__(self, collection_name: str, cursor=None):
@@ -39,19 +69,10 @@ class NeuralSearcher:
         )
         return payloads
 
-
 n = NeuralSearcher("lens_posts_4")
 
-# Define the GraphQL API endpoint
-graphql_url = 'https://api.lens.dev/playground'
-
-@st.cache_resource(ttl=600)
-def get_response(query, variables):
-    response = requests.post(graphql_url, json={'query': query, 'variables': variables})
-    # Parse the response JSON and display the results in Streamlit
-    data = response.json()
-    return data
-
+# Define GraphQL API endpoint
+graphql_url = "https://api.lens.dev/playground"
 query = '''
 query {
   explorePublications(
@@ -106,36 +127,50 @@ query {
 }
 '''
 variables = {'genre': 'Science Fiction'}
-st.header("Lens Discovery")
+
+@st.cache_resource(ttl=600, show_spinner=False)
+def get_response(query, variables):
+    response = requests.post(graphql_url, json={"query": query, "variables": variables})
+    data = response.json()
+    return data
+
+def search_neural(text):
+    results = n.search(text)
+    return results
 
 def format_text(text):
     results = n.search(text)
-    st.header(f"total results found: {len(results)}")
-    # row6_spacer1, row6_1, row6_spacer2, row6_2  = st.columns((.2, 4.3, .4, 4.4))
+    if not results:
+        return None
+    st.header("posts found")
     row6_spacer1, row6_1  = st.columns((.2, 7.3))
 
     with row6_1:
       for r in results:
         st.write("----------------------------------------------------------------------------------------------------------------------------------------------------")
         st.markdown(
-            f'<div style="border: 1px solid #ccc; border-radius: 5px; padding: 10px; margin-bottom: 10px; background-color: black">'
-            f'<a href="https://lenster.xyz/posts/{r.payload["post_id"]}" style="text-decoration: none; color: #333;">'
-            f'<h3>{r.payload["post_id"]}</h3></a><p style="font-size: 14px;">{r.payload["content"]}</p></div>',
+            f"""
+            <a href="https://lenster.xyz/posts/{r.payload["post_id"]}" style="text-decoration: none;" />
+            <h3>{r.payload["post_id"]}</h3></a><p style="font-size: 16px;">{r.payload["content"]}</p></div>
+            """,
             unsafe_allow_html=True
         )
-
 
 t = st.text_input("Search for anything...", 
         placeholder="ethdenver hackers",
 )
 if t:
-    # st.header("You may also like")
+    st.markdown(
+      f"""
+
+      <div class="gradient-background" style="border: 1px solid #ccc; color: #fff, border-radius: 5px; padding: 10px; margin-bottom: 10px; ">
+      """,
+      unsafe_allow_html=True
+    )
+
     format_text(t)
 
-# Parse the response JSON and display the results in Streamlit
-# data = response.json()
 data = get_response(query, variables)
-
 
 def format_latest(data_raw):
     df = pd.DataFrame(data_raw)
@@ -143,18 +178,21 @@ def format_latest(data_raw):
     for r in data.itertuples():
         if r.metadata["content"].strip() == "":
             continue
-        # st.write("=====================================")
-        st.markdown(#background-color: #270707
-            f'<div style="border: 1px solid #ccc; border-radius: 5px; padding: 10px; margin-bottom: 10px; ">'
-            f'<a href="https://lenster.xyz/posts/{r.id}" style="text-decoration: none; color: #333;">'
-            f'<h3>{r.id}</h3></a><p style="font-size: 14px;">{r.metadata["content"]}</p></div>',
+        # set the gradient background
+        st.markdown(
+            f"""
+
+            <div class="gradient-background" style="border: 1px solid #ccc; border-radius: 5px; padding: 10px; margin-bottom: 10px; ">
+            <a href="https://lenster.xyz/posts/{r.id}" style="text-decoration: none; color: white;">
+            <h3>{r.id}</h3></a><p style="font-size: 16px; color: white;">{r.metadata["content"]}</p></div>
+            """,
             unsafe_allow_html=True
         )
 
-        btn_clicked = st.button(f'More like this: {r.id}')
+        btn_clicked = st.button(f'find similar: {r.id}')
         if btn_clicked:
             format_text(r.metadata["content"])
-
+        st.write("----------------------------------------------------------------------------------------------------------------------------------------------------")
 
 st.header("Latest posts")
 if data['data']['explorePublications']['items']:
