@@ -5,7 +5,7 @@
   },
   "machine": {
     "entrypoint": "entrypoint.sh",
-    "ramLength": "128Mi"
+    "ramLength": "4096Mi"
   },
   "contract": {
     "inputDuration": 86400,
