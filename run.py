@@ -12,8 +12,8 @@ import requests
 
 st.set_page_config(layout="wide", page_title="Lens Discovery")
 
+@st.cache_resource
 class NeuralSearcher:
-
     def __init__(self, collection_name: str, cursor=None):
         self.collection_name = collection_name
         self.model = SentenceTransformer('distilbert-base-nli-stsb-mean-tokens', device='cpu')
@@ -101,6 +101,7 @@ query {
 }
 '''
 variables = {'genre': 'Science Fiction'}
+st.header("Lens Discovery")
 
 def format_text(text):
     results = n.search(text)
@@ -136,7 +137,7 @@ def format_latest(data_raw):
     for r in data.itertuples():
         if r.metadata["content"].strip() == "":
             continue
-        st.write("=====================================")
+        # st.write("=====================================")
         st.markdown(#background-color: #270707
             f'<div style="border: 1px solid #ccc; border-radius: 5px; padding: 10px; margin-bottom: 10px; ">'
             f'<a href="https://lenster.xyz/posts/{r.id}" style="text-decoration: none; color: #333;">'
